@@ -1,42 +1,43 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 const CustomInput = ({ value, onChange }) => (
   <input type="number" value={value} onChange={onChange} />
 );
 
-const useCurrencyConverter = () => {
-  const [euros, setEuros] = useState(0);
-  const [dollars, setDollars] = useState(0);
+const useCurrencyConverter = (initialValue, change) => {
+  const [baseValue, setBaseValue] = useState(initialValue);
+  const [convertedValue, setConvertedValue] = useState(initialValue * change);
 
-  const changeEuros = (e) => {
-    const euroAmount = e.target.value ? parseFloat(e.target.value) : 0;
-    setEuros(euroAmount);
-    const convertedDollars = euroAmount * 1.12; // Suponiendo 1 euro = 1.12 dólares
-    setDollars(convertedDollars);
+  const handleChange = (e) => {
+    const inputValue = e.target.value ? parseFloat(e.target.value) : 0;
+    setBaseValue(inputValue);
+    setConvertedValue(inputValue * change);
   };
 
-  const changeDollars = (e) => {
-    const dollarAmount = e.target.value ? parseFloat(e.target.value) : 0;
-    setDollars(dollarAmount);
-    const convertedEuros = dollarAmount / 1.12; // Tipo de cambio inverso
-    setEuros(convertedEuros);
-  };
-
-  return { euros, dollars, changeEuros, changeDollars };
+  return { baseValue, convertedValue, handleChange };
 };
 
-const CurrencyChange = () => {
-  const { euros, dollars, changeEuros, changeDollars } = useCurrencyConverter();
+const CurrencyChanger = ({ currencySymbol, initialValue, change }) => {
+  const { baseValue, convertedValue, handleChange } = useCurrencyConverter(
+    parseFloat(initialValue),
+    parseFloat(change)
+  );
 
   return (
-    <>
-      Euros:
-      <CustomInput value={euros} onChange={changeEuros} /> <br></br>
-      Dollars:
-      <CustomInput value={dollars} onChange={changeDollars} />
-    </>
+    <div>
+      {currencySymbol}:
+      <CustomInput value={baseValue} onChange={handleChange} /> <br />
+      Euros: {convertedValue}
+    </div>
   );
 };
 
-export default CurrencyChange;
+const App = () => (
+  <div>
+    <CurrencyChanger currencySymbol="$" initialValue="10" change="1.055925" />
+    <CurrencyChanger currencySymbol="£" initialValue="15" change="7.578144" />
+    <CurrencyChanger currencySymbol="¥" initialValue="20" change="0.866575" />
+  </div>
+);
+
+export default App;
