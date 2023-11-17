@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 
 const CustomInput = ({ value, onChange }) => (
   <input type="number" value={value} onChange={onChange} />
 );
 
-const CurrencyChange = () => {
+const useCurrencyConverter = () => {
   const [euros, setEuros] = useState(0);
   const [dollars, setDollars] = useState(0);
 
@@ -21,6 +22,12 @@ const CurrencyChange = () => {
     const convertedEuros = dollarAmount / 1.12; // Tipo de cambio inverso
     setEuros(convertedEuros);
   };
+
+  return { euros, dollars, changeEuros, changeDollars };
+};
+
+const CurrencyChange = () => {
+  const { euros, dollars, changeEuros, changeDollars } = useCurrencyConverter();
 
   return (
     <>
