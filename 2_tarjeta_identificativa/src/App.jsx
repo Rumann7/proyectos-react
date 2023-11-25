@@ -1,28 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import styled from "@emotion/styled";
-
-const usersData = [
-  {
-    name: "EUGENIO",
-    surname: "RUIZ DOMENECH",
-    username: "eugenio_98",
-    gender: "male",
-    birthdate: "05/04/1998",
-    age: 25,
-    email: "eugenio_98@hotmail.com",
-    province: "Sevilla",
-    image: "https://randomuser.me/api/portraits/lego/1.jpg",
-  },
-  // Add more user data objects here...
-];
 
 const FlexContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
   gap: 20px;
 `;
 
+// capricho mio, me encanta como queda honestamente
 const generateRandomColor = () => {
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(Math.random() * 256);
@@ -31,7 +19,6 @@ const generateRandomColor = () => {
 };
 
 const UserCard = styled.div`
-  width: 300px;
   border-radius: 8px;
   padding: 20px;
   text-align: left;
@@ -72,30 +59,92 @@ const Provincia = styled.div`
   font-size: 15px;
 `;
 
+const Encabecado = styled.header`
+  background-color: green;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  font-weight: bold;
+  font-size: 50px;
+  padding: ;
+`;
+
 function App() {
-  return (
-    <FlexContainer>
-      {usersData.map((user, index) => {
-        const randomColor = generateRandomColor();
-        return (
-          <UserCard key={index} borderColor={randomColor}>
-            <UserName backgroundColor={randomColor}> {user.username}</UserName>
-            <div style={{ display: "flex" }}>
-              <Image src={user.image} alt={`${user.name} ${user.surname}`} />
-              <UserText>
-                <Name>{user.name}</Name>
-                <div>{user.surname}</div> <br />
-                <Provincia>{user.province}</Provincia>
-                <p style={{ fontSize: "10px" }}>
-                  {user.birthdate} ({user.age} años)
-                </p>
-              </UserText>
-            </div>
-            <p>{user.email}</p>
-          </UserCard>
+  const [usersData, setUsersData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "https://randomuser.me/api/?nat=es&results=10"
         );
-      })}
-    </FlexContainer>
+        const data = await response.json();
+        const users = data.results.map((user) => ({
+          name: user.name.first.toUpperCase(),
+          surname: user.name.last.toUpperCase(),
+          username: user.login.username,
+          gender: user.gender,
+          birthdate: user.dob.date,
+          age: user.dob.age,
+          email: user.email,
+          province: user.location.state,
+          image: getImageURL(user),
+        }));
+        setUsersData(users);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getImageURL = (user) => {
+    const getRandomInt = (max) => Math.floor(Math.random() * max);
+    return `https://randomuser.me/api/portraits/${
+      user.gender === "female" ? "women" : "men"
+    }/${getRandomInt(100)}.jpg`;
+  };
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return <div>Ocurrió un error al cargar los datos.</div>;
+  }
+
+  return (
+    <>
+      <Encabecado> EJERCICIO 2 REACT </Encabecado> <br /> <br /> <br />
+      <FlexContainer>
+        {usersData.map((user, index) => {
+          const randomColor = generateRandomColor();
+          return (
+            <UserCard key={index} borderColor={randomColor}>
+              <UserName backgroundColor={randomColor}>{user.username}</UserName>
+              <div style={{ display: "flex" }}>
+                <Image src={user.image} alt={`${user.name} ${user.surname}`} />
+                <UserText>
+                  <Name>{user.name}</Name>
+                  <div>{user.surname}</div> <br />
+                  <Provincia>{user.province}</Provincia>
+                  <p style={{ fontSize: "10px" }}>
+                    {user.birthdate} ({user.age} años)
+                  </p>
+                </UserText>
+              </div>
+              <p>{user.email}</p>
+            </UserCard>
+          );
+        })}
+      </FlexContainer>
+    </>
   );
 }
 
