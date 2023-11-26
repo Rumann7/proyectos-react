@@ -67,19 +67,22 @@ const Encabecado = styled.header`
   top: 0;
   font-weight: bold;
   font-size: 50px;
-  padding: ;
+  padding: 5px;
 `;
 
 function App() {
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [quantity, setQuantity] = useState(5);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       try {
         const response = await fetch(
-          "https://randomuser.me/api/?nat=es&results=10"
+          `https://randomuser.me/api/?nat=es&results=${quantity}`
         );
         const data = await response.json();
         const users = data.results.map((user) => ({
@@ -102,7 +105,7 @@ function App() {
     };
 
     fetchData();
-  }, []);
+  }, [quantity]);
 
   const getImageURL = (user) => {
     const getRandomInt = (max) => Math.floor(Math.random() * max);
@@ -119,9 +122,31 @@ function App() {
     return <div>Ocurrió un error al cargar los datos.</div>;
   }
 
+  const handleQuantityChange = (event) => {
+    setQuantity(parseInt(event.target.value, 10));
+  };
+
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
     <>
       <Encabecado> EJERCICIO 2 REACT </Encabecado> <br /> <br /> <br />
+      <select
+        value={quantity}
+        onChange={handleQuantityChange}
+        disabled={loading}
+      >
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={15}>15</option>
+        <option value={20}>20</option>
+      </select>
+      <button onClick={handleReload} disabled={loading}>
+        {" "}
+        Recargar datos{" "}
+      </button>
       <FlexContainer>
         {usersData.map((user, index) => {
           const randomColor = generateRandomColor();
