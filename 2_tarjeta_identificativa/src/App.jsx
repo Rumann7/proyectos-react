@@ -129,7 +129,6 @@ function App() {
   const handleReload = () => {
     window.location.reload();
   };
-
   return (
     <>
       <Encabecado> EJERCICIO 2 REACT </Encabecado> <br /> <br /> <br />
