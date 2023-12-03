@@ -115,7 +115,12 @@ function App() {
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <>
+        <Encabecado> EJERCICIO 2 REACT </Encabecado> <br /> <br /> <br />
+        <div>Cargando...</div>
+      </>
+    );
   }
 
   if (error) {
